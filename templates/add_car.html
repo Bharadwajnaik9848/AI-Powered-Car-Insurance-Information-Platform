@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Add Car{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-10">
+    <div class="custom-card">
+        <h2 class="text-center text-2xl font-semibold mb-4">Add a New Car</h2>
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Brand</label>
+                <input type="text" name="brand" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Model</label>
+                <input type="text" name="model" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Year</label>
+                <input type="number" name="year" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Price</label>
+                <input type="number" step="0.01" name="price" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Mileage</label>
+                <input type="number" step="0.01" name="mileage" class="w-full p-2 rounded bg-gray-800 text-white">
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Features</label>
+                <textarea name="features" class="w-full p-2 rounded bg-gray-800 text-white"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Owner History</label>
+                <textarea name="owner_history" class="w-full p-2 rounded bg-gray-800 text-white"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Accident History</label>
+                <textarea name="accident_history" class="w-full p-2 rounded bg-gray-800 text-white"></textarea>
+            </div>
+            <button type="submit" class="btn btn-custom w-full">Add Car</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

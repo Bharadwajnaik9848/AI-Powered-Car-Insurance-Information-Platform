@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Comparison Result{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto mt-10">
+    <div class="custom-card">
+        <h2 class="text-center text-2xl font-semibold mb-4">Comparison Result</h2>
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold">{{ car1.brand }} {{ car1.model }} ({{ car1.year }})</h3>
+            <p><strong>Price:</strong> ${{ car1.price }}</p>
+            <p><strong>Mileage:</strong> {{ car1.mileage }} miles</p>
+            <p><strong>Features:</strong> {{ car1.features }}</p>
+            <p><strong>Accident History:</strong> {{ car1.accident_history }}</p>
+        </div>
+        <hr class="my-4">
+        <div class="mb-4">
+            <h3 class="text-xl font-semibold">{{ car2.brand }} {{ car2.model }} ({{ car2.year }})</h3>
+            <p><strong>Price:</strong> ${{ car2.price }}</p>
+            <p><strong>Mileage:</strong> {{ car2.mileage }} miles</p>
+            <p><strong>Features:</strong> {{ car2.features }}</p>
+            <p><strong>Accident History:</strong> {{ car2.accident_history }}</p>
+        </div>
+        <hr class="my-4">
+        <div class="mt-4">
+            <h3 class="text-lg font-semibold">AI-Powered Comparison:</h3>
+            <p>{{ result }}</p>
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('compare') }}" class="btn btn-custom">Compare Another</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

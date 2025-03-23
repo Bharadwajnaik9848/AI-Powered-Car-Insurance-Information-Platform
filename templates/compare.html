@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Compare Cars{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-10">
+    <div class="custom-card">
+        <h2 class="text-center text-2xl font-semibold mb-4">Compare Two Cars</h2>
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Select First Car</label>
+                <select name="car1" class="w-full p-2 rounded bg-gray-800 text-white">
+                    {% for car in cars %}
+                    <option value="{{ car.id }}">{{ car.brand }} {{ car.model }} ({{ car.year }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Select Second Car</label>
+                <select name="car2" class="w-full p-2 rounded bg-gray-800 text-white">
+                    {% for car in cars %}
+                    <option value="{{ car.id }}">{{ car.brand }} {{ car.model }} ({{ car.year }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-custom w-full">Compare Cars</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

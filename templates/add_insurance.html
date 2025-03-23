@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Add Insurance{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto mt-10">
+    <div class="custom-card">
+        <h2 class="text-center text-2xl font-semibold mb-4">Add Insurance</h2>
+        <form method="POST">
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Select Car</label>
+                <select name="car_id" class="w-full p-2 rounded bg-gray-800 text-white">
+                    {% for car in cars %}
+                    <option value="{{ car.id }}">{{ car.brand }} {{ car.model }} ({{ car.year }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Insurance Provider</label>
+                <input type="text" name="provider" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Coverage Options</label>
+                <textarea name="coverage_options" class="w-full p-2 rounded bg-gray-800 text-white"></textarea>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Estimated Premium</label>
+                <input type="number" step="0.01" name="estimated_premium" class="w-full p-2 rounded bg-gray-800 text-white" required>
+            </div>
+            <div class="mb-4">
+                <label class="block text-lg font-medium text-gray-300">Past Claims</label>
+                <textarea name="past_claims" class="w-full p-2 rounded bg-gray-800 text-white"></textarea>
+            </div>
+            <button type="submit" class="btn btn-custom w-full">Add Insurance</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
