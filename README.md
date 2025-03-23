@@ -166,7 +166,7 @@ The **AI-Powered Car & Insurance Information Platform** allows users to search f
 ### **Installation**  
 ```sh
 # Clone the repository
-git clone https://github.com/your-repo/ai-car-insurance-platform.git
+git clone https://github.com/Bharadwajnaik9848/AI-Powered-Car-Insurance-Information-Platform
 
 # Navigate into the project directory
 cd ai-car-insurance-platform
