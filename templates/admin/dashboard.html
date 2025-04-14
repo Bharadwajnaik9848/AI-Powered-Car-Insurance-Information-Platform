@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Car AI Assistant{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold">Admin Dashboard</h1>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-2">Users</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ stats.total_users }}</p>
+            <a href="{{ url_for('admin.users') }}" class="text-blue-500 hover:underline mt-2 inline-block">
+                Manage Users →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-2">Cars</h3>
+            <p class="text-3xl font-bold text-green-600">{{ stats.total_cars }}</p>
+            <a href="{{ url_for('admin.cars') }}" class="text-blue-500 hover:underline mt-2 inline-block">
+                Manage Cars →
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-2">Insurance Estimates</h3>
+            <p class="text-3xl font-bold text-purple-600">{{ stats.total_insurance_estimates }}</p>
+            <a href="{{ url_for('admin.insurance') }}" class="text-blue-500 hover:underline mt-2 inline-block">
+                Manage Insurance →
+            </a>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Recent Users -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Users</h3>
+            <div class="space-y-4">
+                {% for user in stats.recent_users %}
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ user.username }}</p>
+                        <p class="text-sm text-gray-600">{{ user.email }}</p>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        {{ user.created_at.strftime('%Y-%m-%d') }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Cars -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Cars</h3>
+            <div class="space-y-4">
+                {% for car in stats.recent_cars %}
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ car.year }} {{ car.make }} {{ car.model }}</p>
+                        <p class="text-sm text-gray-600">${{ "%.2f"|format(car.price) }}</p>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        {{ car.created_at.strftime('%Y-%m-%d') }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Insurance Estimates -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-lg font-semibold mb-4">Recent Insurance Estimates</h3>
+            <div class="space-y-4">
+                {% for estimate in stats.recent_estimates %}
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ estimate.car.year }} {{ estimate.car.make }}</p>
+                        <p class="text-sm text-gray-600">${{ "%.2f"|format(estimate.monthly_premium) }}/mo</p>
+                    </div>
+                    <span class="text-sm text-gray-500">
+                        {{ estimate.created_at.strftime('%Y-%m-%d') }}
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

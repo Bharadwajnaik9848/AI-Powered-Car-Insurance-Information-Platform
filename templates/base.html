@@ -3,51 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}AI Car & Insurance{% endblock %}</title>
+    <title>{% block title %}{% endblock %} - Car AI Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #121212;
-            color: #e0e0e0;
-            font-family: 'Poppins', sans-serif;
-        }
-        .custom-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0px 4px 10px rgba(255, 255, 255, 0.1);
-        }
-        .btn-custom {
-            background: linear-gradient(135deg, #ff7e5f, #feb47b);
-            border: none;
-            color: white;
-            transition: 0.3s;
-        }
-        .btn-custom:hover {
-            background: linear-gradient(135deg, #feb47b, #ff7e5f);
-            transform: scale(1.05);
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
-    <nav class="p-4 bg-gray-900 shadow-lg">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="/" class="text-white text-2xl font-bold">🚗 AI Car & Insurance</a>
-            <div>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('logout') }}" class="btn btn-custom">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}" class="btn btn-custom">Login</a>
-                    <a href="{{ url_for('register') }}" class="btn btn-custom">Register</a>
-                {% endif %}
+<body class="min-h-screen bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{{ url_for('home') }}" class="text-2xl font-bold text-blue-600">
+                            <i class="fas fa-car-side mr-2"></i>Car AI
+                        </a>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="{{ url_for('home') }}"
+                           class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600">
+                            Home
+                        </a>
+                        {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('cars.list_cars') }}"
+                           class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600">
+                            Cars
+                        </a>
+                        <a href="{{ url_for('comparisons.list') }}"
+                           class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600">
+                            Comparisons
+                        </a>
+                        <a href="{{ url_for('insurance.estimates') }}"
+                           class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600">
+                            Insurance
+                        </a>
+                        {% if current_user.is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}"
+                           class="inline-flex items-center px-1 pt-1 text-gray-900 hover:text-blue-600">
+                            Admin
+                        </a>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right side menu -->
+                <div class="flex items-center">
+                    {% if current_user.is_authenticated %}
+                    <div class="hidden md:ml-4 md:flex-shrink-0 md:flex md:items-center">
+                        <!-- Profile dropdown -->
+                        <div class="ml-3 relative group">
+                            <div>
+                                <button type="button"
+                                        class="flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    <span class="sr-only">Open user menu</span>
+                                    <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                                        {{ current_user.username[0].upper() }}
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="hidden group-hover:block absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5">
+                                <div class="px-4 py-2 text-sm text-gray-700">
+                                    {{ current_user.username }}
+                                </div>
+                                <hr>
+                                <a href="{{ url_for('auth.logout') }}"
+                                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    Sign out
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="flex space-x-4">
+                        <a href="{{ url_for('auth.login') }}"
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50">
+                            Sign in
+                        </a>
+                        <a href="{{ url_for('auth.signup') }}"
+                           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            Sign up
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
-    
-    <div class="container my-5">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 mt-4">
+                {% for category, message in messages %}
+                    <div class="rounded-md p-4 mb-4 {% if category == 'error' %}bg-red-50 text-red-700{% else %}bg-green-50 text-green-700{% endif %}">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if category == 'error' %}
+                                    <i class="fas fa-exclamation-circle"></i>
+                                {% else %}
+                                    <i class="fas fa-check-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium">{{ message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-auto">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 md:flex md:items-center md:justify-between lg:px-8">
+            <div class="flex justify-center space-x-6 md:order-2">
+                <a href="#" class="text-gray-400 hover:text-gray-500">
+                    <span class="sr-only">GitHub</span>
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-gray-500">
+                    <span class="sr-only">Twitter</span>
+                    <i class="fab fa-twitter text-xl"></i>
+                </a>
+            </div>
+            <div class="mt-8 md:mt-0 md:order-1">
+                <p class="text-center text-base text-gray-400">
+                    &copy; {{ now.year }} Car AI Assistant. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

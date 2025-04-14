@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}{% if car %}Edit{% else %}Add{% endif %} Car{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">
+            {% if car %}Edit{% else %}Add{% endif %} Car
+        </h1>
+        <a href="{{ url_for('admin.cars') }}"
+           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-blue-50">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Cars
+        </a>
+    </div>
+
+    <div class="bg-white shadow sm:rounded-lg">
+        <div class="p-6">
+            <form method="POST" class="space-y-8">
+                <!-- Basic Information -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-medium text-gray-900">Basic Information</h3>
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
+                        <div>
+                            <label for="make" class="block text-sm font-medium text-gray-700">Make</label>
+                            <input type="text" name="make" id="make" required
+                                   value="{{ car.make if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="model" class="block text-sm font-medium text-gray-700">Model</label>
+                            <input type="text" name="model" id="model" required
+                                   value="{{ car.model if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="year" class="block text-sm font-medium text-gray-700">Year</label>
+                            <input type="number" name="year" id="year" required
+                                   value="{{ car.year if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                            <select name="category" id="category" required
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">Select a category</option>
+                                {% for cat in ['Sedan', 'SUV', 'Hatchback', 'Coupe', 'Truck', 'Van'] %}
+                                <option value="{{ cat }}" {% if car and car.category == cat %}selected{% endif %}>
+                                    {{ cat }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="price" class="block text-sm font-medium text-gray-700">Price ($)</label>
+                            <input type="number" name="price" id="price" required step="0.01"
+                                   value="{{ car.price if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Engine & Performance -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-medium text-gray-900">Engine & Performance</h3>
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
+                        <div>
+                            <label for="engine_type" class="block text-sm font-medium text-gray-700">Engine Type</label>
+                            <input type="text" name="engine_type" id="engine_type"
+                                   value="{{ car.engine_type if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="engine_displacement" class="block text-sm font-medium text-gray-700">Engine Displacement (cc)</label>
+                            <input type="number" name="engine_displacement" id="engine_displacement"
+                                   value="{{ car.engine_displacement if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="horsepower" class="block text-sm font-medium text-gray-700">Horsepower</label>
+                            <input type="number" name="horsepower" id="horsepower"
+                                   value="{{ car.horsepower if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="transmission" class="block text-sm font-medium text-gray-700">Transmission</label>
+                            <select name="transmission" id="transmission"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">Select transmission</option>
+                                {% for trans in ['Manual', 'Automatic', 'CVT', 'DCT'] %}
+                                <option value="{{ trans }}" {% if car and car.transmission == trans %}selected{% endif %}>
+                                    {{ trans }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="fuel_type" class="block text-sm font-medium text-gray-700">Fuel Type</label>
+                            <select name="fuel_type" id="fuel_type"
+                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <option value="">Select fuel type</option>
+                                {% for fuel in ['Petrol', 'Diesel', 'Electric', 'Hybrid'] %}
+                                <option value="{{ fuel }}" {% if car and car.fuel_type == fuel %}selected{% endif %}>
+                                    {{ fuel }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label for="fuel_efficiency" class="block text-sm font-medium text-gray-700">Fuel Efficiency (km/l)</label>
+                            <input type="number" name="fuel_efficiency" id="fuel_efficiency" step="0.1"
+                                   value="{{ car.fuel_efficiency if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dimensions -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-medium text-gray-900">Dimensions & Capacity</h3>
+                    <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-3">
+                        <div>
+                            <label for="length" class="block text-sm font-medium text-gray-700">Length (mm)</label>
+                            <input type="number" name="length" id="length"
+                                   value="{{ car.length if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="width" class="block text-sm font-medium text-gray-700">Width (mm)</label>
+                            <input type="number" name="width" id="width"
+                                   value="{{ car.width if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="height" class="block text-sm font-medium text-gray-700">Height (mm)</label>
+                            <input type="number" name="height" id="height"
+                                   value="{{ car.height if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="wheelbase" class="block text-sm font-medium text-gray-700">Wheelbase (mm)</label>
+                            <input type="number" name="wheelbase" id="wheelbase"
+                                   value="{{ car.wheelbase if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="ground_clearance" class="block text-sm font-medium text-gray-700">Ground Clearance (mm)</label>
+                            <input type="number" name="ground_clearance" id="ground_clearance"
+                                   value="{{ car.ground_clearance if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="boot_space" class="block text-sm font-medium text-gray-700">Boot Space (L)</label>
+                            <input type="number" name="boot_space" id="boot_space"
+                                   value="{{ car.boot_space if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="seating_capacity" class="block text-sm font-medium text-gray-700">Seating Capacity</label>
+                            <input type="number" name="seating_capacity" id="seating_capacity"
+                                   value="{{ car.seating_capacity if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="fuel_tank_capacity" class="block text-sm font-medium text-gray-700">Fuel Tank Capacity (L)</label>
+                            <input type="number" name="fuel_tank_capacity" id="fuel_tank_capacity"
+                                   value="{{ car.fuel_tank_capacity if car else '' }}"
+                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-5">
+                    <div class="flex justify-end space-x-3">
+                        <a href="{{ url_for('admin.cars') }}"
+                           class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Cancel
+                        </a>
+                        <button type="submit"
+                                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            {% if car %}Update{% else %}Create{% endif %} Car
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if estimate else 'Add New' }} Insurance Estimate - Car AI Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">{{ 'Edit' if estimate else 'Add New' }} Insurance Estimate</h1>
+    
+    <form method="POST" class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+        <!-- Car Selection -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-medium text-gray-900">Car Information</h3>
+            {% if not estimate %}
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Car</label>
+                <select name="car_id" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">Select Car</option>
+                    {% for car in cars %}
+                    <option value="{{ car.id }}" {% if car.id == car_id %}selected{% endif %}>
+                        {{ car.year }} {{ car.make }} {{ car.model }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Coverage Details -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-medium text-gray-900">Coverage Details</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Coverage Type</label>
+                    <select name="coverage_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="">Select Coverage Type</option>
+                        {% for type in ['Basic', 'Comprehensive', 'Premium'] %}
+                        <option value="{{ type }}" {% if estimate and estimate.coverage_type == type %}selected{% endif %}>
+                            {{ type }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Annual Premium ($)</label>
+                    <input type="number" step="0.01" name="annual_premium" required
+                           value="{{ estimate.annual_premium if estimate else '' }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Deductible ($)</label>
+                    <input type="number" step="0.01" name="deductible" required
+                           value="{{ estimate.deductible if estimate else '' }}"
+                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4 mt-6">
+            <a href="{{ url_for('insurance.estimates') }}"
+               class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Cancel
+            </a>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                {{ 'Save Changes' if estimate else 'Add Estimate' }}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

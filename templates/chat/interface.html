@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}AI Chat Assistant - Car AI Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">AI Chat Assistant</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="h-[600px] overflow-y-auto mb-4 space-y-4 p-4">
+            {% for message in messages %}
+            <div class="flex {% if message.role == 'user' %}justify-end{% endif %}">
+                <div class="max-w-3/4 p-4 rounded-lg {% if message.role == 'user' %}bg-blue-100 text-blue-900{% else %}bg-gray-100 text-gray-900{% endif %} shadow-sm">
+                    <div class="text-sm mb-1 {% if message.role == 'user' %}text-blue-600{% else %}text-gray-600{% endif %}">
+                        {{ message.role|title }}
+                    </div>
+                    <div class="whitespace-pre-wrap">{{ message.content }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden mb-4">
+            <div class="flex items-center space-x-2 text-gray-600">
+                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+                <span>AI is thinking...</span>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <form id="chat-form" class="flex space-x-4">
+            <input type="hidden" id="session-id" value="{{ session_id }}">
+            <input type="text" id="message-input" 
+                   class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                   placeholder="Ask about cars, insurance, or anything automotive..."
+                   autocomplete="off">
+            <button type="submit" 
+                    class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    id="send-button">
+                Send
+            </button>
+        </form>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('chat-form');
+    const input = document.getElementById('message-input');
+    const messagesDiv = document.getElementById('chat-messages');
+    const sessionId = document.getElementById('session-id').value;
+    const sendButton = document.getElementById('send-button');
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    function scrollToBottom() {
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function appendMessage(content, isUser) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${isUser ? 'justify-end' : ''}`;
+        
+        const innerDiv = document.createElement('div');
+        innerDiv.className = `max-w-3/4 p-4 rounded-lg ${isUser ? 'bg-blue-100 text-blue-900' : 'bg-gray-100 text-gray-900'} shadow-sm`;
+        
+        const roleDiv = document.createElement('div');
+        roleDiv.className = `text-sm mb-1 ${isUser ? 'text-blue-600' : 'text-gray-600'}`;
+        roleDiv.textContent = isUser ? 'User' : 'Assistant';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'whitespace-pre-wrap';
+        contentDiv.textContent = content;
+        
+        innerDiv.appendChild(roleDiv);
+        innerDiv.appendChild(contentDiv);
+        messageDiv.appendChild(innerDiv);
+        messagesDiv.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    function setLoading(isLoading) {
+        loadingIndicator.classList.toggle('hidden', !isLoading);
+        input.disabled = isLoading;
+        sendButton.disabled = isLoading;
+    }
+
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const message = input.value.trim();
+        if (!message) return;
+
+        setLoading(true);
+        appendMessage(message, true);
+        input.value = '';
+
+        try {
+            const response = await fetch('/chat/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message: message
+                })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            appendMessage(data.message, false);
+        } catch (error) {
+            console.error('Error:', error);
+            appendMessage('Sorry, there was an error processing your request. Please try again.', false);
+        } finally {
+            setLoading(false);
+        }
+    });
+
+    // Initial scroll to bottom
+    scrollToBottom();
+});
+</script>
+{% endblock %}
+{% endblock %}

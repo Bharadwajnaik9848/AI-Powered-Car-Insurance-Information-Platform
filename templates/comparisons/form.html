@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}New Car Comparison - Car AI Assistant{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">New Car Comparison</h1>
+    
+    <form method="POST" class="bg-white rounded-lg shadow-lg p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Car 1 Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">First Car</label>
+                <select name="car1_id" required id="car1-select"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">Select First Car</option>
+                    {% for car in cars %}
+                    <option value="{{ car.id }}" {% if car.id == car_id %}selected{% endif %}>
+                        {{ car.year }} {{ car.make }} {{ car.model }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Car 2 Selection -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Second Car</label>
+                <select name="car2_id" required id="car2-select"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="">Select Second Car</option>
+                    {% for car in cars %}
+                    <option value="{{ car.id }}">
+                        {{ car.year }} {{ car.make }} {{ car.model }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Comparison Details -->
+        <div class="space-y-4">
+            <h3 class="text-lg font-medium text-gray-900">Comparison Details</h3>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Price Difference ($)</label>
+                <input type="number" step="0.01" name="price_difference" id="price-difference"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" readonly>
+            </div>
+            
+            <!-- Hidden input for AI-generated conclusion -->
+            <input type="hidden" name="conclusion" id="conclusion-input">
+            
+            <!-- AI Comparison Preview -->
+            <div id="ai-preview" class="hidden">
+                <h4 class="text-sm font-medium text-gray-700 mb-2">AI-Generated Comparison</h4>
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <div class="flex items-center space-x-2 text-gray-600 mb-2">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                        <span>Generating comparison...</span>
+                    </div>
+                    <div id="comparison-text" class="text-gray-700"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-4 mt-6">
+            <a href="{{ url_for('comparisons.list') }}"
+               class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                Cancel
+            </a>
+            <button type="button" id="generate-btn"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                Generate Comparison
+            </button>
+            <button type="submit" id="save-btn"
+                    class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                Save Comparison
+            </button>
+        </div>
+    </form>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const car1Select = document.getElementById('car1-select');
+    const car2Select = document.getElementById('car2-select');
+    const priceDifference = document.getElementById('price-difference');
+    const aiPreview = document.getElementById('ai-preview');
+    const comparisonText = document.getElementById('comparison-text');
+    const generateBtn = document.getElementById('generate-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const conclusionInput = document.getElementById('conclusion-input');
+    const form = document.querySelector('form');
+    const carsData = {{ cars|tojson|safe }};
+
+    function updatePriceDifference() {
+        const car1Id = parseInt(car1Select.value);
+        const car2Id = parseInt(car2Select.value);
+        
+        if (car1Id && car2Id) {
+            const car1 = carsData.find(c => c.id === car1Id);
+            const car2 = carsData.find(c => c.id === car2Id);
+            
+            if (car1 && car2) {
+                const diff = car1.price - car2.price;
+                priceDifference.value = diff.toFixed(2);
+                generateBtn.disabled = false;
+            }
+        } else {
+            generateBtn.disabled = true;
+        }
+    }
+
+    async function generateComparison() {
+        const car1Id = parseInt(car1Select.value);
+        const car2Id = parseInt(car2Select.value);
+        
+        if (!car1Id || !car2Id) return;
+        
+        const car1 = carsData.find(c => c.id === car1Id);
+        const car2 = carsData.find(c => c.id === car2Id);
+        
+        if (!car1 || !car2) return;
+        
+        aiPreview.classList.remove('hidden');
+        generateBtn.disabled = true;
+        
+        try {
+            const response = await fetch('/comparisons/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    car1: car1,
+                    car2: car2,
+                    price_difference: parseFloat(priceDifference.value)
+                })
+            });
+            
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            comparisonText.textContent = data.conclusion;
+            conclusionInput.value = data.conclusion;
+            saveBtn.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error:', error);
+            comparisonText.textContent = 'Error generating comparison. Please try again.';
+        } finally {
+            generateBtn.disabled = false;
+        }
+    }
+
+    car1Select.addEventListener('change', updatePriceDifference);
+    car2Select.addEventListener('change', updatePriceDifference);
+    generateBtn.addEventListener('click', generateComparison);
+});
+</script>
+{% endblock %}
+{% endblock %}
